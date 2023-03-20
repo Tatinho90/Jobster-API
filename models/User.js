@@ -23,9 +23,26 @@ const UserSchema = new mongoose.Schema({
     required: [true, 'Please provide password'],
     minlength: 6,
   },
+  lastName: {
+    type: String,
+    trim: true,
+    maxlength: 20,
+    default: "lastName"
+  },
+  location: {
+    type: String,
+    trim: true,
+    maxlength: 20,
+    default: "my city"
+  }
+
 })
 
 UserSchema.pre('save', async function () {
+  //we want to check if the password has been modified
+  //if the password hasn't been modified (e.g. a user just updates the name and not
+  //the password) we want to skip encrypting the passowrd once more) by applyiny salt)
+  if(!this.isModified("password"))  {return }
   const salt = await bcrypt.genSalt(10)
   this.password = await bcrypt.hash(this.password, salt)
 })

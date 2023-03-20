@@ -12,8 +12,16 @@ const auth = async (req, res, next) => {
 
   try {
     const payload = jwt.verify(token, process.env.JWT_SECRET)
+
+    //we want to restrict the test user to only have Read Only rights
+    //this is how we identify the test User (will be either true or false)
+
+    const testUser = payload.userId === "64171dfba264083ab0b13568"
+
     // attach the user to the job routes
-    req.user = { userId: payload.userId, name: payload.name }
+    req.user = { userId: payload.userId, testUser }
+
+
     next()
   } catch (error) {
     throw new UnauthenticatedError('Authentication invalid')
